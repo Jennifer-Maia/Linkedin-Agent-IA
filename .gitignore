@@ -1,0 +1,23 @@
+# Secrets and local configuration
+.claude/settings.json
+.claude/settings.*.json
+.claude/settings.deepseek.backup.json
+.env
+.env.*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor and temporary files
+.vscode/
+*.tmp
+*.temp
+*.log
+
+# Test artifacts
+test/approval-sandbox/
+
+# Generated or local cache
+.cache/
