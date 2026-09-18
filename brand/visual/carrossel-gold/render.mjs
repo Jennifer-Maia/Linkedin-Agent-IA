@@ -33,6 +33,55 @@ function parseArgs() {
   if (!existsSync(templatePath)) throw new Error(`Template não encontrado: ${templatePath}`);
 }
 
+function hasField(object, field) {
+  return Object.prototype.hasOwnProperty.call(object, field);
+}
+
+function requireString(value, field, filePath) {
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`Campo ausente ou inválido: ${field} em ${filePath}`);
+  }
+}
+
+function validateInput(data, filePath) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new Error(`JSON inválido: ${filePath}; esperado um objeto.`);
+  }
+
+  if (!hasField(data, 'canvas')) {
+    throw new Error(`Campo ausente: canvas em ${filePath}`);
+  }
+  const canvas = data.canvas;
+  if (!canvas || typeof canvas !== 'object' || Array.isArray(canvas)) {
+    throw new Error(`Campo inválido: canvas em ${filePath}; esperado um objeto.`);
+  }
+
+  for (const dimension of ['width', 'height']) {
+    const field = `canvas.${dimension}`;
+    if (!hasField(canvas, dimension)) {
+      throw new Error(`Campo ausente: ${field} em ${filePath}`);
+    }
+    if (!Number.isInteger(canvas[dimension]) || canvas[dimension] <= 0) {
+      throw new Error(`Campo inválido: ${field} em ${filePath}; esperado um número inteiro positivo.`);
+    }
+  }
+
+  if (!hasField(data, 'theme')) {
+    throw new Error(`Campo ausente: theme em ${filePath}`);
+  }
+  requireString(data.theme, 'theme', filePath);
+
+  if (!hasField(data, 'slides')) {
+    throw new Error(`Campo ausente: slides em ${filePath}`);
+  }
+  if (!Array.isArray(data.slides)) {
+    throw new Error(`Campo inválido: slides em ${filePath}; esperado um array.`);
+  }
+  if (data.slides.length === 0) {
+    throw new Error(`Campo inválido: slides em ${filePath}; esperado pelo menos um slide.`);
+  }
+}
+
 function findBrowser() {
   const configured = browserPath || process.env.EDGE_PATH || process.env.CHROME_PATH;
   const candidates = [
@@ -54,7 +103,20 @@ function escapeForScriptJson(value) {
   return JSON.stringify(value).replaceAll('<', '\\u003c');
 }
 
-function fillTemplate(template, payload) {
+function buildGoldPayload(data, slide, index, total) {
+  const number = String(index + 1).padStart(2, '0');
+  return {
+    theme: data.theme,
+    descriptor: data.brand.descriptor,
+    brandMark: data.brand.name,
+    brandDescriptor: data.brand.descriptor,
+    number,
+    total: String(total).padStart(2, '0'),
+    slide,
+  };
+}
+
+function fillGoldTemplate(template, payload) {
   return template
     .replaceAll('{{THEME}}', payload.theme)
     .replaceAll('{{VARIANT}}', payload.slide.variant)
@@ -103,7 +165,7 @@ function waitForFile(filePath, timeoutMs = 10000) {
   return true;
 }
 
-function renderSlide(browser, htmlPath, pngPath, profileDir) {
+function renderSlide(browser, htmlPath, pngPath, profileDir, width, height) {
   rmSync(pngPath, { force: true });
   const result = spawnSync(browser, [
     '--headless=new',
@@ -123,7 +185,7 @@ function renderSlide(browser, htmlPath, pngPath, profileDir) {
     '--run-all-compositor-stages-before-draw',
     '--virtual-time-budget=1000',
     `--user-data-dir=${profileDir}`,
-    '--window-size=1080,1350',
+    `--window-size=${width},${height}`,
     `--screenshot=${pngPath}`,
     pathToFileURL(htmlPath).href,
   ], {
@@ -139,19 +201,30 @@ function renderSlide(browser, htmlPath, pngPath, profileDir) {
   if (!waitForFile(pngPath)) throw new Error(`Nenhum PNG foi criado: ${pngPath}`);
 
   const size = pngSize(pngPath);
-  if (size.width !== 1080 || size.height !== 1350) {
-    throw new Error(`Dimensão incorreta em ${pngPath}: ${size.width}x${size.height}`);
+  if (size.width !== width || size.height !== height) {
+    throw new Error(`Dimensão incorreta em ${pngPath}: ${size.width}x${size.height}; esperado ${width}x${height}.`);
   }
   return size;
 }
 
+function readJson(filePath) {
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8'));
+  } catch (error) {
+    throw new Error(`JSON inválido em ${filePath}: ${error.message}`);
+  }
+}
+
 function main() {
   parseArgs();
-  mkdirSync(outputPath, { recursive: true });
+  const data = readJson(inputPath);
+  validateInput(data, inputPath);
 
-  const data = JSON.parse(readFileSync(inputPath, 'utf8'));
   const template = readFileSync(templatePath, 'utf8');
   const browser = findBrowser();
+  const { width, height } = data.canvas;
+  mkdirSync(outputPath, { recursive: true });
+
   const tempRoot = mkdtempSync(join(tmpdir(), 'carrossel-gold-'));
   const profileDir = join(tempRoot, 'profile');
   const results = [];
@@ -159,19 +232,11 @@ function main() {
   try {
     data.slides.forEach((slide, index) => {
       const number = String(index + 1).padStart(2, '0');
-      const payload = {
-        theme: data.theme,
-        descriptor: data.brand.descriptor,
-        brandMark: data.brand.name,
-        brandDescriptor: data.brand.descriptor,
-        number,
-        total: String(data.slides.length).padStart(2, '0'),
-        slide,
-      };
+      const payload = buildGoldPayload(data, slide, index, data.slides.length);
       const htmlPath = join(tempRoot, `slide-${number}.html`);
       const pngPath = join(outputPath, `${number}-${slide.id}.png`);
-      writeFileSync(htmlPath, fillTemplate(template, payload), 'utf8');
-      const size = renderSlide(browser, htmlPath, pngPath, profileDir);
+      writeFileSync(htmlPath, fillGoldTemplate(template, payload), 'utf8');
+      const size = renderSlide(browser, htmlPath, pngPath, profileDir, width, height);
       results.push({ file: pngPath, ...size });
       process.stdout.write(`${number} ${slide.id}: ${size.width}x${size.height}\n`);
     });

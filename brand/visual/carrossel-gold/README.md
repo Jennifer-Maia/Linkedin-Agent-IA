@@ -32,6 +32,44 @@ Use `--keep-temp` para preservar os HTMLs intermediários durante diagnóstico:
 node brand/visual/carrossel-gold/render.mjs --keep-temp
 ```
 
+## Contrato de entrada
+
+O arquivo JSON informado por `--input` deve ser um objeto com esta estrutura:
+
+```json
+{
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "theme": "dark",
+  "brand": {
+    "name": "J",
+    "descriptor": "DADOS / ARQUITETURA"
+  },
+  "slides": [
+    {
+      "id": "01",
+      "variant": "cover",
+      "label": "TRABALHO · ARQUITETURA",
+      "title": "Título do slide",
+      "lede": "Texto de abertura",
+      "callout": "Texto de destaque",
+      "footnote": "Referência do slide"
+    }
+  ]
+}
+```
+
+- `canvas.width` e `canvas.height` são obrigatórios, inteiros e positivos; definem a janela do navegador e as dimensões esperadas de cada PNG.
+- `theme` é obrigatório e não pode estar vazio.
+- `slides` é obrigatório e deve ser um array não vazio.
+- Para o template Gold, cada slide precisa de `id`, `variant`, `label`, `title`, `lede` e `footnote`. As variantes `cover` e `closing` usam `callout`; `stack` e `interface` usam `cards`; `flow` usa `flow`.
+- `brand.name` e `brand.descriptor` são obrigatórios para o template Gold. Os itens de `cards` precisam de `index`, `title` e `text`; `flow` precisa de `origin.label`, `origin.meta`, `connections[].target` e `connections[].meta`.
+- O renderer informa o campo inválido e o arquivo de entrada quando a validação falha. JSON malformado também é reportado com o caminho do arquivo.
+
+Os caminhos `--input`, `--template`, `--output` e `--browser` são configuráveis. A saída mantém o nome `NN-ID.png` e valida cada PNG contra as dimensões declaradas em `canvas`.
+
 ## Decisão visual
 
 - **Modo:** dark/core. A sequência trata de arquitetura, fluxo e documentação da camada Gold; o dark foi escolhido para presença editorial, leitura técnica e continuidade com a âncora visual da marca.
@@ -46,4 +84,4 @@ O texto foi condensado a partir do conteúdo aprovado, sem acrescentar experiên
 
 ## Validação
 
-O renderer valida o cabeçalho PNG e exige exatamente `1080 × 1350 px` para cada arquivo. A composição usa margem segura de `96 px`, grid de oito colunas, no máximo três blocos por slide, uma ênfase coral por composição, numeração e paginação no rodapé.
+O renderer valida o cabeçalho PNG e exige as dimensões declaradas em `canvas.width` e `canvas.height` para cada arquivo. A composição usa margem segura de `96 px`, grid de oito colunas, no máximo três blocos por slide, uma ênfase coral por composição, numeração e paginação no rodapé.
