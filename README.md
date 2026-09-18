@@ -2,25 +2,25 @@
 
 Sistema pessoal para apoiar a criação, revisão e organização de conteúdo técnico para o LinkedIn.
 
-O projeto foi criado para transformar experiências práticas, aprendizados técnicos e projetos pessoais em conteúdo autêntico, estruturado e revisado humanamente.
+O projeto transforma experiências práticas, aprendizados técnicos e projetos pessoais em conteúdo autêntico, estruturado e revisado humanamente.
+
+A publicação permanece sempre manual.
 
 ## Objetivo
 
-O LinkedIn Content Engine ajuda a:
+O sistema ajuda a:
 
 - organizar pesquisas e ideias;
 - transformar ideias em drafts;
-- revisar conteúdo antes da publicação;
-- manter consistência de voz e posicionamento;
-- decidir quando um conteúdo realmente precisa de um recurso visual;
-- preparar imagens, diagramas e carrosséis de forma reproduzível;
-- preservar aprovação humana em todas as etapas.
-
-A publicação permanece manual.
+- revisar conteúdo;
+- manter consistência editorial;
+- decidir quando um post precisa de recurso visual;
+- gerar imagens, diagramas e carrosséis reproduzíveis;
+- preservar aprovação humana antes da publicação.
 
 ## Posicionamento
 
-O projeto representa uma profissional de dados em evolução, que:
+A identidade representa uma profissional de dados em evolução, que:
 
 - aprende construindo;
 - trabalha com dados reais;
@@ -28,7 +28,7 @@ O projeto representa uma profissional de dados em evolução, que:
 - compartilha aprendizados práticos;
 - evolui em direção a Data Engineering e Data Architecture.
 
-O conteúdo não deve sugerir senioridade, autoridade ou experiência que ainda não correspondam à trajetória real.
+O projeto não deve sugerir senioridade, autoridade ou experiência que não correspondam à trajetória real.
 
 ## Temas principais
 
@@ -48,7 +48,7 @@ O conteúdo não deve sugerir senioridade, autoridade ou experiência que ainda 
 - projetos pessoais;
 - evolução profissional.
 
-## Pipeline de conteúdo
+## Pipeline
 
 ```text
 RESEARCH
@@ -68,22 +68,23 @@ VISUAL
 PUBLISHED
 ```
 
-A etapa `PUBLISHED` não realiza publicação automática. O conteúdo é publicado manualmente pela usuária.
+A etapa `PUBLISHED` não publica automaticamente. A publicação é manual.
 
 ## Estrutura do projeto
 
 ```text
 .
 ├── .claude/       # Configurações relacionadas ao agente
-├── approval/      # Registros e decisões de aprovação
-├── approved/      # Conteúdos aprovados para as próximas etapas
+├── approval/      # Registros de aprovação
+├── approved/      # Conteúdos aprovados
 ├── brand/         # Identidade e sistema visual
 ├── context/       # Contexto pessoal, profissional e editorial
-├── drafts/        # Rascunhos de conteúdo
-├── ideas/         # Ideias ainda não desenvolvidas
-├── research/      # Pesquisas e referências de conteúdo
+├── drafts/        # Rascunhos
+├── ideas/         # Ideias
+├── research/      # Pesquisas
 ├── review/        # Conteúdos em revisão
-├── skills/        # Skills de apoio ao pipeline
+├── skills/        # Skills do pipeline
+├── specs/         # Especificações de implementação
 └── published/     # Registro de conteúdos publicados
 ```
 
@@ -91,7 +92,7 @@ A etapa `PUBLISHED` não realiza publicação automática. O conteúdo é public
 
 A camada visual não tem como objetivo gerar imagens aleatórias por IA.
 
-O fluxo visual esperado é:
+O fluxo esperado é:
 
 ```text
 Conteúdo aprovado
@@ -109,20 +110,20 @@ QA visual
 Peça final
 ```
 
-A decisão visual deve identificar se o conteúdo precisa de:
+O sistema deve decidir conscientemente entre:
 
-- nenhum visual;
+- sem visual;
 - imagem única;
 - carrossel;
 - diagrama;
 - comparação;
 - outro formato adequado ao conteúdo.
 
-O sistema não deve transformar todos os posts em carrosséis.
+Nem todo post deve se tornar um carrossel.
 
 ## Princípios visuais
 
-A identidade visual deve ser:
+A identidade deve ser:
 
 - técnica;
 - editorial;
@@ -133,19 +134,9 @@ A identidade visual deve ser:
 - confiante sem arrogância;
 - coerente com uma trajetória em evolução.
 
-A identidade pode variar entre direções `dark` e `light`, sem perder consistência.
+Dark e light são direções oficiais. O banner dark funciona como âncora da marca, mas não como template universal.
 
-A consistência deve vir principalmente de:
-
-- tipografia;
-- hierarquia;
-- espaçamento;
-- geometria;
-- composição;
-- tratamento de linhas e diagramas;
-- qualidade editorial.
-
-A direção visual deve evitar:
+Devem ser evitados:
 
 - estética cyberpunk;
 - neon;
@@ -160,76 +151,76 @@ A direção visual deve evitar:
 
 ## Renderização
 
-A composição final deve ser feita preferencialmente por uma abordagem determinística, como:
+A composição final deve ser feita preferencialmente por:
 
 ```text
 HTML/CSS/SVG → PNG
 ```
 
-Isso permite:
+Essa abordagem permite:
 
 - texto nítido e correto;
 - fontes consistentes;
 - layouts reproduzíveis;
 - menor consumo de tokens;
 - menor dependência de geração de imagem;
-- QA automatizado ou repetível.
+- QA repetível.
 
-A geração de imagem por IA deve ser reservada para elementos pontuais que realmente não sejam simples de construir com código.
+A geração de imagem por IA deve ser reservada para elementos pontuais que não sejam simples de construir por código.
 
-## Formatos visuais
+## Formatos
 
-O formato padrão para carrosséis é:
+O formato preferencial para carrosséis é:
 
 ```text
 1080 × 1350 px
 ```
 
-A produção deve respeitar:
-
-- área segura;
-- legibilidade em dispositivos móveis;
-- hierarquia clara;
-- contraste;
-- alinhamento;
-- consistência entre slides.
-
-O banner do LinkedIn utiliza:
+O formato do banner do LinkedIn é:
 
 ```text
 1584 × 396 px
 ```
 
-## Documentação visual atual
+Toda peça deve respeitar margem segura, contraste, legibilidade em celular e hierarquia clara.
 
-A pasta `brand/` contém a documentação inicial da identidade e do sistema visual, incluindo:
+## MVP visual atual
 
-- identidade visual;
-- paleta;
-- tipografia;
-- iconografia;
-- especificação do banner;
-- sistema visual;
-- tokens;
-- grid e layout;
-- regras de decisão visual;
-- checklist de QA.
+O primeiro MVP determinístico está em:
 
-O banner dark existente funciona como âncora da linguagem visual da marca, mas não deve ser copiado literalmente para todos os posts.
+```text
+brand/visual/carrossel-gold/
+```
 
-## Decisões arquiteturais
+Para reproduzir:
 
-As decisões relevantes da camada visual são registradas em ADRs.
+```bash
+node brand/visual/carrossel-gold/render.mjs
+```
 
-Entre os princípios atuais estão:
+O MVP gera cinco PNGs de `1080 × 1350 px` usando HTML/CSS/SVG e Microsoft Edge ou Chrome em modo headless.
+
+## Decisões e especificações
+
+As decisões arquiteturais da camada visual ficam em:
+
+```text
+brand/decisions/
+```
+
+As especificações de implementação ficam em:
+
+```text
+specs/
+```
+
+Decisões atuais:
 
 - dark e light são direções oficiais;
-- o banner é uma referência de identidade, não um template universal;
-- a renderização determinística é o padrão para peças com texto e estrutura;
+- o banner é uma âncora, não um template universal;
+- a renderização determinística é o padrão;
 - a aprovação humana continua obrigatória;
 - a publicação automática não faz parte do projeto.
-
-As especificações de implementação são registradas separadamente em `specs/`.
 
 ## Estado atual
 
@@ -237,44 +228,37 @@ As especificações de implementação são registradas separadamente em `specs/
 
 - pipeline inicial de conteúdo;
 - contexto editorial e profissional;
-- identidade visual inicial;
-- banner de LinkedIn;
-- documentação da camada visual;
-- definição de tokens e grid;
-- regras iniciais para escolha de formato;
-- checklist de QA visual;
-- definição de ADRs e SPECs para orientar implementações.
+- identidade visual;
+- banner do LinkedIn;
+- documentação visual;
+- tokens e grid;
+- regras iniciais de decisão visual;
+- ADRs e SPECs;
+- primeiro MVP determinístico de carrossel.
 
-### Em andamento
+### Próximos passos
 
-- primeiro MVP visual determinístico;
-- template de carrossel técnico de arquitetura/fluxo;
-- renderer reproduzível;
-- validação de uma peça real em 1080 × 1350 px.
+- tornar o renderer reutilizável;
+- separar decisão visual, dados e renderização;
+- criar templates adicionais gradualmente;
+- implementar uma direção light validada;
+- criar QA visual mais automatizado;
+- criar a skill visual somente depois da validação do sistema.
 
-### Planejado
-
-- templates adicionais;
-- histórico visual do feed;
-- biblioteca organizada de referências;
-- maior automação da decisão visual;
-- QA automatizado;
-- skill visual somente após a validação do sistema e do renderer.
-
-## Regras de segurança editorial
+## Regras editoriais
 
 O projeto deve:
 
-- manter a aprovação humana;
+- manter aprovação humana;
 - não publicar automaticamente;
-- não inventar experiência profissional;
-- não transformar estudo em experiência de trabalho;
+- não inventar experiência;
+- não transformar estudo em experiência profissional;
 - não criar autoridade artificial;
-- não usar logos ou certificações como prova de senioridade;
-- preservar a autenticidade da trajetória da usuária.
+- distinguir trabalho, estudo e projeto pessoal;
+- preservar a autenticidade da trajetória.
 
 ## Status
 
 Projeto pessoal em desenvolvimento.
 
-A camada de conteúdo está estruturada e a camada visual está passando da fase documental para a fase de implementação de um primeiro renderer determinístico.
+A camada visual concluiu seu primeiro MVP e está avançando da validação para a construção de um sistema reutilizável.

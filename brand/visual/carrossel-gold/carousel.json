@@ -1,0 +1,108 @@
+{
+  "canvas": {
+    "width": 1080,
+    "height": 1350,
+    "safeMargin": 96,
+    "columns": 8,
+    "gutter": 24
+  },
+  "theme": "dark",
+  "brand": {
+    "name": "J",
+    "descriptor": "DADOS / ARQUITETURA"
+  },
+  "slides": [
+    {
+      "id": "01",
+      "variant": "cover",
+      "label": "TRABALHO · ARQUITETURA",
+      "title": "O consumidor da minha camada Gold está mudando",
+      "lede": "Não é só dashboard. O próximo consumidor pode ser um agente de IA.",
+      "callout": "A Gold precisa ser clara para quem consulta — humano ou agente.",
+      "footnote": "IDEA-20260911-01"
+    },
+    {
+      "id": "02",
+      "variant": "stack",
+      "label": "TRABALHO · CAMADA GOLD",
+      "title": "A Gold existe para consumo",
+      "lede": "Quem chega até ela não deveria precisar entender como o dado foi parar lá.",
+      "cards": [
+        {
+          "index": "01",
+          "title": "Entender",
+          "text": "O consumidor não precisa reconstruir o caminho até a Gold."
+        },
+        {
+          "index": "02",
+          "title": "Consultar",
+          "text": "A tabela precisa estar pronta para as perguntas que vão fazer."
+        },
+        {
+          "index": "03",
+          "title": "Interpretar",
+          "text": "Comentários e tags ajudam a dar contexto ao que existe."
+        }
+      ],
+      "footnote": "CAMADA GOLD · FUNÇÃO"
+    },
+    {
+      "id": "03",
+      "variant": "flow",
+      "label": "TRABALHO · FLUXO",
+      "title": "O próximo consumidor pode não ser humano",
+      "lede": "Um agente de IA não me pergunta. Ele interpreta o que encontra.",
+      "flow": {
+        "origin": {
+          "label": "Camada Gold",
+          "meta": "dados prontos para consumo"
+        },
+        "connections": [
+          {
+            "target": "Analista",
+            "meta": "consulta e faz perguntas"
+          },
+          {
+            "target": "Agente de IA",
+            "meta": "possível próximo consumidor"
+          }
+        ]
+      },
+      "footnote": "CENÁRIO OBSERVADO · NÃO É USO DOCUMENTADO"
+    },
+    {
+      "id": "04",
+      "variant": "interface",
+      "label": "TRABALHO · UNITY CATALOG",
+      "title": "Comentários e tags são interface",
+      "lede": "Eu sempre encarei isso como organização e documentação. Agora vejo outro uso: a interface para os próximos consumidores.",
+      "cards": [
+        {
+          "index": "01",
+          "title": "Comentário",
+          "text": "Explica o que a tabela representa."
+        },
+        {
+          "index": "02",
+          "title": "Tag",
+          "text": "Ajuda a encontrar o ativo certo."
+        },
+        {
+          "index": "03",
+          "title": "Contexto",
+          "text": "Ajuda o consumidor a entender o que encontrar."
+        }
+      ],
+      "footnote": "ROTINA DOCUMENTADA · UNITY CATALOG"
+    },
+    {
+      "id": "05",
+      "variant": "closing",
+      "label": "TRABALHO · FECHAMENTO",
+      "title": "Quero que ele entenda o que encontrar",
+      "lede": "Não sei quando um agente vai consultar uma tabela que modelei. Mas, quando isso acontecer, quero que ele entenda o que encontrar.",
+      "callout": "Modelar a Gold é preparar o consumo — para pessoas e para agentes.",
+      "footnote": "IDEA-20260911-01 · APROVADO"
+    }
+  ]
+}
