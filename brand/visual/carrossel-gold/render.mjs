@@ -12,6 +12,20 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
+const DEFAULT_TEMPLATE = 'architecture-flow';
+const TEMPLATE_CONFIGS = {
+  'architecture-flow': {
+    templatePath: join(scriptDir, 'template.html'),
+    buildPayload: buildGoldPayload,
+    fillTemplate: fillGoldTemplate,
+  },
+  'editorial-statement': {
+    templatePath: resolve(scriptDir, '../imagem-unica-editorial/template.html'),
+    buildPayload: buildEditorialPayload,
+    fillTemplate: fillEditorialTemplate,
+    validate: validateEditorialInput,
+  },
+};
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 1) {
   const argument = process.argv[index];
@@ -70,6 +84,20 @@ function validateInput(data, filePath) {
     throw new Error(`Campo ausente: theme em ${filePath}`);
   }
   requireString(data.theme, 'theme', filePath);
+  if (!['dark', 'light'].includes(data.theme)) {
+    throw new Error(`Campo inválido: theme em ${filePath}; esperado "dark" ou "light".`);
+  }
+
+  if (!hasField(data, 'brand')) {
+    throw new Error(`Campo ausente: brand em ${filePath}`);
+  }
+  const brand = data.brand;
+  if (!brand || typeof brand !== 'object' || Array.isArray(brand)) {
+    throw new Error(`Campo inválido: brand em ${filePath}; esperado um objeto.`);
+  }
+  for (const field of ['name', 'descriptor']) {
+    requireString(brand[field], `brand.${field}`, filePath);
+  }
 
   if (!hasField(data, 'slides')) {
     throw new Error(`Campo ausente: slides em ${filePath}`);
@@ -80,6 +108,14 @@ function validateInput(data, filePath) {
   if (data.slides.length === 0) {
     throw new Error(`Campo inválido: slides em ${filePath}; esperado pelo menos um slide.`);
   }
+  data.slides.forEach((slide, index) => {
+    if (!slide || typeof slide !== 'object' || Array.isArray(slide)) {
+      throw new Error(`Campo inválido: slides[${index}] em ${filePath}; esperado um objeto.`);
+    }
+    for (const field of ['id', 'variant']) {
+      requireString(slide[field], `slides[${index}].${field}`, filePath);
+    }
+  });
 }
 
 function findBrowser() {
@@ -127,6 +163,69 @@ function fillGoldTemplate(template, payload) {
     .replaceAll('{{NUMBER}}', payload.number)
     .replaceAll('{{TOTAL}}', payload.total)
     .replaceAll('{{DATA_JSON}}', escapeForScriptJson(payload));
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function buildEditorialPayload(data, slide) {
+  return {
+    theme: data.theme,
+    label: slide.label,
+    title: slide.title,
+    lede: slide.lede,
+    calloutBlock: slide.callout
+      ? `<aside class="callout-block">${escapeHtml(slide.callout)}</aside>`
+      : '',
+    brandMark: data.brand.name,
+    brandDescriptor: data.brand.descriptor,
+    context: data.context,
+    source: data.source,
+  };
+}
+
+function fillEditorialTemplate(template, payload) {
+  return template
+    .replaceAll('{{THEME}}', escapeHtml(payload.theme))
+    .replaceAll('{{CONTEXT}}', escapeHtml(payload.context))
+    .replaceAll('{{SOURCE}}', escapeHtml(payload.source))
+    .replaceAll('{{LABEL}}', escapeHtml(payload.label))
+    .replaceAll('{{TITLE}}', escapeHtml(payload.title))
+    .replaceAll('{{LEDE}}', escapeHtml(payload.lede))
+    .replaceAll('{{CALLOUT_BLOCK}}', payload.calloutBlock)
+    .replaceAll('{{BRAND_MARK}}', escapeHtml(payload.brandMark))
+    .replaceAll('{{BRAND_DESCRIPTOR}}', escapeHtml(payload.brandDescriptor));
+}
+
+function validateEditorialInput(data, filePath) {
+  if (data.format !== 'imagem_unica') {
+    throw new Error(`Campo inválido: format em ${filePath}; esperado "imagem_unica".`);
+  }
+  if (data.theme !== 'dark') {
+    throw new Error(`Template editorial-statement requer theme "dark" em ${filePath}.`);
+  }
+  requireString(data.context, 'context', filePath);
+  requireString(data.source, 'source', filePath);
+  if (data.slides.length !== 1) {
+    throw new Error(`Template editorial-statement requer exatamente um slide em ${filePath}.`);
+  }
+
+  const slide = data.slides[0];
+  if (slide.variant !== 'statement') {
+    throw new Error(`Campo inválido: slides[0].variant em ${filePath}; esperado "statement".`);
+  }
+  for (const field of ['label', 'title', 'lede']) {
+    requireString(slide[field], `slides[0].${field}`, filePath);
+  }
+  if (hasField(slide, 'callout')) {
+    requireString(slide.callout, 'slides[0].callout', filePath);
+  }
 }
 
 function wait(milliseconds) {
@@ -215,12 +314,32 @@ function readJson(filePath) {
   }
 }
 
+function resolveTemplateConfig(data, filePath) {
+  const templateName = hasField(data, 'template') ? data.template : DEFAULT_TEMPLATE;
+  if (typeof templateName !== 'string' || templateName.trim() === '') {
+    throw new Error(`Campo ausente ou inválido: template em ${filePath}`);
+  }
+
+  const templateConfig = TEMPLATE_CONFIGS[templateName];
+  if (!templateConfig) {
+    const supportedTemplates = Object.keys(TEMPLATE_CONFIGS).join(', ');
+    throw new Error(`Template desconhecido: ${templateName} em ${filePath}. Templates suportados: ${supportedTemplates}.`);
+  }
+  return { name: templateName, ...templateConfig };
+}
+
 function main() {
   parseArgs();
   const data = readJson(inputPath);
   validateInput(data, inputPath);
+  const templateConfig = resolveTemplateConfig(data, inputPath);
+  templateConfig.validate?.(data, inputPath);
 
-  const template = readFileSync(templatePath, 'utf8');
+  const selectedTemplatePath = args.has('template') ? templatePath : templateConfig.templatePath;
+  if (!existsSync(selectedTemplatePath)) {
+    throw new Error(`Template não encontrado: ${selectedTemplatePath}`);
+  }
+  const template = readFileSync(selectedTemplatePath, 'utf8');
   const browser = findBrowser();
   const { width, height } = data.canvas;
   mkdirSync(outputPath, { recursive: true });
@@ -232,10 +351,10 @@ function main() {
   try {
     data.slides.forEach((slide, index) => {
       const number = String(index + 1).padStart(2, '0');
-      const payload = buildGoldPayload(data, slide, index, data.slides.length);
+      const payload = templateConfig.buildPayload(data, slide, index, data.slides.length);
       const htmlPath = join(tempRoot, `slide-${number}.html`);
       const pngPath = join(outputPath, `${number}-${slide.id}.png`);
-      writeFileSync(htmlPath, fillGoldTemplate(template, payload), 'utf8');
+      writeFileSync(htmlPath, templateConfig.fillTemplate(template, payload), 'utf8');
       const size = renderSlide(browser, htmlPath, pngPath, profileDir, width, height);
       results.push({ file: pngPath, ...size });
       process.stdout.write(`${number} ${slide.id}: ${size.width}x${size.height}\n`);

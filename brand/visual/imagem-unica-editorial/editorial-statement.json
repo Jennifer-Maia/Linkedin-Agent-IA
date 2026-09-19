@@ -1,0 +1,25 @@
+{
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "theme": "dark",
+  "brand": {
+    "name": "J",
+    "descriptor": "DADOS / ARQUITETURA"
+  },
+  "format": "imagem_unica",
+  "template": "editorial-statement",
+  "context": "aprendizado",
+  "source": "EXAMPLE-EDITORIAL-01",
+  "slides": [
+    {
+      "id": "01",
+      "variant": "statement",
+      "label": "APRENDIZADO · DADOS",
+      "title": "A camada Gold não é o fim do dado.",
+      "lede": "É o começo de uma consulta bem compreendida.",
+      "callout": "Clareza também é parte da arquitetura."
+    }
+  ]
+}
