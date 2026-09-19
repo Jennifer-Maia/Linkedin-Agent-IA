@@ -1,0 +1,11 @@
+{
+  "source": "EXAMPLE-SEM-VISUAL-01",
+  "content_context": "opiniao",
+  "visual_needed": false,
+  "format": "sem_visual",
+  "template": null,
+  "theme": null,
+  "reason": "A mensagem é curta, narrativa e autossuficiente. Um recurso visual acrescentaria decoração, mas não melhoraria a compreensão.",
+  "confidence": "high",
+  "human_review_required": true
+}

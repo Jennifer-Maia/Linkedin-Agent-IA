@@ -1,0 +1,11 @@
+{
+  "source": "IDEA-20260911-01",
+  "content_context": "trabalho",
+  "visual_needed": true,
+  "format": "carrossel",
+  "template": "architecture-flow",
+  "theme": "dark",
+  "reason": "O conteúdo apresenta uma sequência de ideias sobre a camada Gold, seus consumidores e a importância de contexto, comentários e tags.",
+  "confidence": "high",
+  "human_review_required": true
+}
